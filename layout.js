@@ -4,9 +4,8 @@ a layout on top of d3.pack layout to make circles visually more visible
 function d3CircleLayout(_nodes) {
 
     var nodes = _nodes;
-    var high_priortiy_value = 5;
-
-    function BinaryCircle(node1, node2, priority) {
+    
+    function CirclePair(node1, node2, priority) {
 
         this.c1 = node1;
         this.c2 = node2;
@@ -107,11 +106,11 @@ function d3CircleLayout(_nodes) {
         for (var i = startIndex; i < node.children.length; i++) {
             var t = node.children[i];
             var intersected = false;
-            for (var j = 0; j < node.binaries.length; j++) {
-                var binaryCircle = node.binaries[j];
+            for (var j = 0; j < node.pairs.length; j++) {
+                var pair = node.pairs[j];
 
-                t.x = binaryCircle.gapCenterPoint.x;
-                t.y = binaryCircle.gapCenterPoint.y;
+                t.x = pair.gapCenterPoint.x;
+                t.y = pair.gapCenterPoint.y;
 
                 for (var k = 0; k < node.circles.length; k++) {
                     intersected = isIntersect(t, node.circles[k])
@@ -121,31 +120,31 @@ function d3CircleLayout(_nodes) {
                 }
                 if (!intersected) {
 
-                    node.binaries.splice(j, 1); //no need this binary any more
+                    node.pairs.splice(j, 1); //no need this pair any more
 
-                    updateBinaries(i, t, node)
+                    updatePairs(i, t, node)
 
                     break;
                 }
             }
             if (intersected) { //means no suitable place for circle try find place at peak points this is applicable for nodes has children less 13 
                 moveToEdge(t, node, "TR");
-                if (isAnyIntersect(t, node.children)) { //if there is still intersection try bottom right otherwise(which is rare case) leave at bottom right 
+                if (isAnyIntersect(t, node.children)) { //if there is still intersection try bottom right otherwise leave at bottom right 
                     moveToEdge(t, node, "BR");
                 }
             }
         }
     }
 
-    function updateBinaries(startIndex, circle, node) {
+    function updatePairs(startIndex, circle, node) {
 
         for (var l = startIndex - 1; l > 0; l--) {
             var n = node.children[l];
             if (circle.r > 15 || n.r > 15) {
-                node.binaries.push(new BinaryCircle(circle, n));
+                node.pairs.push(new CirclePair(circle, n));
             }
         }
-        sortBinaryCircles(node);
+        sortPairCircles(node);
         node.circles.push(circle);
     }
 
@@ -209,8 +208,8 @@ function d3CircleLayout(_nodes) {
         return false;
     };
 
-    function sortBinaryCircles(node) {
-        node.binaries = node.binaries.sort(function(a, b) {
+    function sortPairCircles(node) {
+        node.pairs = node.pairs.sort(function(a, b) {
             return d3.descending(a.gap, b.gap);
         });
     }
@@ -307,26 +306,26 @@ function d3CircleLayout(_nodes) {
         //place rest of circles	
         if (subNodes.length > 4) {
 
-            var binaries = [];
+            var pairs = [];
             var circles = [];
 
-            binaries.push(new BinaryCircle(a, b));
-            binaries.push(new BinaryCircle(a, c, high_priortiy_value));
-            binaries.push(new BinaryCircle(a, d, high_priortiy_value));
+            pairs.push(new CirclePair(a, b));
+            pairs.push(new CirclePair(a, c, 5));
+            pairs.push(new CirclePair(a, d, 5));
             circles.push(a);
 
-            binaries.push(new BinaryCircle(b, c, high_priortiy_value));
-            binaries.push(new BinaryCircle(b, d, high_priortiy_value));
+            pairs.push(new CirclePair(b, c, 5));
+            pairs.push(new CirclePair(b, d, 5));
             circles.push(b);
 
-            binaries.push(new BinaryCircle(c, d));
+            pairs.push(new CirclePair(c, d));
             circles.push(c);
             circles.push(d);
 
             node.circles = circles;
-            node.binaries = binaries;
+            node.pairs = pairs;
 
-            sortBinaryCircles(node);
+            sortPairCircles(node);
 
             updatePositions(node, startIndex);
 
