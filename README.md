@@ -1,6 +1,6 @@
 # d3CircleLayout
 
-a layout on top of d3.pack layout to make circles visually more visible for some cases. Test with d3 version 3.
+a layout on top of d3.pack layout to make circles visually more visible for some cases. Tested with d3 version 3.
 
 #### Usage
 
