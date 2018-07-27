@@ -11,8 +11,6 @@ After applying pack layout add call circle layout like following
 
 Here is the visual difference between standard pack layout.
  
-Pack layout
 ![alt text](https://github.com/tamerh/d3CircleLayout/blob/master/img/pack.png "Pack Layout")
 
-Circle layout
 ![alt text](https://github.com/tamerh/d3CircleLayout/blob/master/img/circle.png "Circle Layout")
